@@ -283,6 +283,42 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = 'v3.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'MunifTanjim/nui.nvim',
+      'nvim-tree/nvim-web-devicons', -- optional, but recommended
+    },
+    keys = {
+      { '<leader>e', ':Neotree reveal<CR>', desc = 'NeoTree [E]xplorer (Toggle)' },
+      { '<leader>eq', ':Neotree close<CR>', desc = 'Explorer NeoTree (Close)' },
+      { '<leader>E', ':Neotree buffers<CR>', desc = 'NeoTree [B]uffers [E]xplorer' },
+    },
+    opts = {
+      window = {
+        mappings = {
+          -- Custom shortcuts for inside the Neo-tree window
+          ['l'] = 'open', -- Use 'l' to open files/folders
+          ['h'] = 'close_node', -- Use 'h' to collapse folders
+          ['v'] = 'open_vsplit', -- Open in vertical split
+          ['s'] = 'open_split', -- Open in horizontal split
+        },
+      },
+      filesystem = {
+        filtered_items = {
+          visible = true, -- Show hidden files by default
+          hide_dotfiles = false,
+          hide_gitignored = false,
+        },
+        follow_current_file = {
+          enabled = true, -- Focus the tree on the file you're currently editing
+        },
+      },
+    },
+    lazy = false, -- neo-tree will lazily load itself
+  },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -900,7 +936,30 @@ require('lazy').setup({
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('lualine').setup {
+        options = {
+          theme = 'tokyonight', -- Matches your current theme
+          -- These are the Triangle/Powerline symbols:
+          section_separators = { left = '', right = '' },
+          component_separators = { left = '', right = '' },
+          icons_enabled = true,
+          globalstatus = true, -- Keeps one single bar at the bottom
+        },
+        sections = {
+          lualine_a = { { 'mode', separator = { right = '' }, right_padding = 2 } },
+          lualine_b = { 'filename', 'branch', 'diff' },
+          lualine_c = { 'diagnostics' },
+          lualine_x = { 'filetype' },
+          lualine_y = { 'progress' },
+          lualine_z = { 'location' },
+        },
+      }
+    end,
+  },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
@@ -918,24 +977,6 @@ require('lazy').setup({
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
-
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
-
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
   { -- Highlight, edit, and navigate code
